@@ -1,23 +1,90 @@
-import logo from './logo.svg';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import format from 'date-fns/format';
+import parse from 'date-fns/parse';
+import startOfWeek from 'date-fns/startOfWeek';
+import getDay from 'date-fns/getDay';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import './App.css';
 
+const locales = {
+  'en-US': require('date-fns/locale/en-US'),
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales
+});
+
+const events = [
+  {
+    title: "Big Meeting",
+    allDay: true,
+    start: new Date(2023, 8, 30),
+    end: new Date(2023, 8, 30),
+  },
+  {
+    title: "Vacation",
+    start: new Date(2023, 8, 7),
+    end: new Date(2023, 8, 12),
+  },
+  {
+    title: "Conference",
+    start: new Date(2023, 8, 20),
+    end: new Date(2023, 8, 23),
+  },
+];
+
 function App() {
+  const [newEvent, setNewEvent] = useState({ title: '', start: '', end: '' });
+  const [allEvents, setAllEvents] = useState(events);
+
+  const handleAddEvent = () => {
+    setAllEvents([...allEvents, newEvent]);
+    setNewEvent({ title: '', start: '', end: '' });
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Calendar</h1>
+      <h2>Add New Event</h2>
+      <div style={{ flexDirection: "row" }}>
+        <input
+          type="text"
+          placeholder="Event Title"
+          // style={{ width: "20%", marginRight: "10px" }}
+          value={newEvent.title}
+          onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+        />
+        <DatePicker
+          placeholderText='Start Date'
+          style={{ marginRight: "10px" }}
+          selected={newEvent.start}
+          onChange={(start) => setNewEvent({ ...newEvent, start })}
+        // showTimeSelect
+        // dateFormat="Pp"
+        />
+        <DatePicker
+          placeholderText='End Date'
+          selected={newEvent.end}
+          onChange={(end) => setNewEvent({ ...newEvent, end })}
+        // showTimeSelect
+        // dateFormat="Pp"
+        />
+        <button style={{ marginTop: "10px" }} onClick={handleAddEvent}>Add Event</button>
+      </div>
+      <Calendar
+        localizer={localizer}
+        events={allEvents}
+        startAccessor="start"
+        endAccessor="end"
+        style={{ height: 500, margin: '50px' }}
+      />
     </div>
   );
 }
